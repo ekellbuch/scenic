@@ -472,7 +472,7 @@ def train(
 def _draw_side_by_side(batch, predictions):
   """Combines image, label and prediction into one image."""
   images = []
-  for i in range(5):
+  for i in range(min(5, batch['inputs'].shape[0])):
     img = batch['inputs'][i]
     true = _apply_colormap(batch['label'][i])
     pred = _apply_colormap(predictions[i])

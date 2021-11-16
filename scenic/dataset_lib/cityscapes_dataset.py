@@ -281,6 +281,9 @@ def get_dataset(*,
   dataset_configs = dataset_configs or {}
   target_size = dataset_configs.get('target_size', None)
 
+  number_train_examples_debug = dataset_configs.get('number_train_examples_debug', None)
+  number_eval_examples_debug = dataset_configs.get('number_eval_examples_debug', None)
+
   logging.info('Loading train split of the Cityscapes dataset.')
   preprocess_ex_train = functools.partial(
       preprocess_example, train=True, dtype=dtype, resize=None)
@@ -294,6 +297,12 @@ def get_dataset(*,
       preprocess_example=preprocess_ex_train,
       augment_train_example=augment_ex,
       shuffle_seed=shuffle_seed)
+
+  if number_train_examples_debug:
+    train_ds = train_ds.take(number_train_examples_debug).cache().repeat()
+    num_train_examples = number_train_examples_debug
+  else:
+    num_train_examples = dataset_utils.get_num_examples('cityscapes', 'train'),
 
   if dataset_service_address:
     if shuffle_seed is not None:
@@ -310,6 +319,12 @@ def get_dataset(*,
   eval_ds, _ = dataset_utils.load_split_from_tfds(
       'cityscapes', eval_batch_size, split='validation',
       preprocess_example=preprocess_ex_eval)
+
+  if number_eval_examples_debug:
+    eval_ds = eval_ds.take(number_eval_examples_debug).cache().repeat()
+    num_eval_examples = number_eval_examples_debug
+  else:
+    num_eval_examples = dataset_utils.get_num_examples('cityscapes', 'eval'),
 
   maybe_pad_batches_train = functools.partial(
       dataset_utils.maybe_pad_batch, train=True, batch_size=batch_size,
@@ -344,9 +359,9 @@ def get_dataset(*,
       'input_shape':
           input_shape,
       'num_train_examples':
-          dataset_utils.get_num_examples('cityscapes', 'train'),
+          num_train_examples,
       'num_eval_examples':
-          dataset_utils.get_num_examples('cityscapes', 'validation'),
+          num_eval_examples,
       'input_dtype':
           getattr(jnp, dtype_str),
       'target_is_onehot':
