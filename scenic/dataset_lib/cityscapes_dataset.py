@@ -324,7 +324,7 @@ def get_dataset(*,
     eval_ds = eval_ds.take(number_eval_examples_debug).cache().repeat()
     num_eval_examples = number_eval_examples_debug
   else:
-    num_eval_examples = dataset_utils.get_num_examples('cityscapes', 'eval'),
+    num_eval_examples = dataset_utils.get_num_examples('cityscapes', 'validation'),
 
   maybe_pad_batches_train = functools.partial(
       dataset_utils.maybe_pad_batch, train=True, batch_size=batch_size,
