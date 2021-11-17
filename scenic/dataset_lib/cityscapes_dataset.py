@@ -302,7 +302,7 @@ def get_dataset(*,
     train_ds = train_ds.take(number_train_examples_debug).cache().repeat()
     num_train_examples = number_train_examples_debug
   else:
-    num_train_examples = dataset_utils.get_num_examples('cityscapes', 'train'),
+    num_train_examples = dataset_utils.get_num_examples('cityscapes', 'train')
 
   if dataset_service_address:
     if shuffle_seed is not None:
@@ -324,7 +324,7 @@ def get_dataset(*,
     eval_ds = eval_ds.take(number_eval_examples_debug).cache().repeat()
     num_eval_examples = number_eval_examples_debug
   else:
-    num_eval_examples = dataset_utils.get_num_examples('cityscapes', 'validation'),
+    num_eval_examples = dataset_utils.get_num_examples('cityscapes', 'validation')
 
   maybe_pad_batches_train = functools.partial(
       dataset_utils.maybe_pad_batch, train=True, batch_size=batch_size,
