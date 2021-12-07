@@ -290,10 +290,12 @@ def get_dataset(*,
   augment_ex = functools.partial(
       augment_example, dtype=dtype, resize=target_size, area_min=30,
       area_max=100)
+
+  train_split = dataset_configs.get('train_split', 'train')
   train_ds, _ = dataset_utils.load_split_from_tfds(
       'cityscapes',
       batch_size,
-      split='train',
+      split=train_split,
       preprocess_example=preprocess_ex_train,
       augment_train_example=augment_ex,
       shuffle_seed=shuffle_seed)
@@ -302,7 +304,7 @@ def get_dataset(*,
     train_ds = train_ds.take(number_train_examples_debug).cache().repeat()
     num_train_examples = number_train_examples_debug
   else:
-    num_train_examples = dataset_utils.get_num_examples('cityscapes', 'train')
+    num_train_examples = dataset_utils.get_num_examples('cityscapes', train_split)
 
   if dataset_service_address:
     if shuffle_seed is not None:
@@ -353,6 +355,7 @@ def get_dataset(*,
   else:
     input_shape = (-1,) + tuple(target_size) + (3,)
 
+  #TODO(ekellbuch): update "class proportions" according to data split
   meta_data = {
       'num_classes':
           len([c.id for c in CLASSES if not c.ignore_in_eval]),
